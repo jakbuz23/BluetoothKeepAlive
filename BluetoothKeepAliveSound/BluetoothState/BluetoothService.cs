@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Enumeration;
@@ -18,14 +19,18 @@ namespace BluetoothKeepAliveSound.BluetoothState
             if (radio.State is RadioState.Off)
                 return EBluetoothState.TurnedOff;
 
-            var connectedCollection = await DeviceInformation.FindAllAsync(
+            var conectedDevicesCollection = await DeviceInformation.FindAllAsync(
                 BluetoothDevice.GetDeviceSelectorFromConnectionStatus(BluetoothConnectionStatus.Connected));
-            if (connectedCollection.Count is 0)
+
+            if (conectedDevicesCollection.Count is 0)
                 return EBluetoothState.EnabledDisconnected;
 
-            var device = await BluetoothDevice.FromIdAsync(connectedCollection[0].Id);
+            var btDevices = new List<BluetoothDevice>();
 
-            return device.ClassOfDevice.MajorClass == BluetoothMajorClass.AudioVideo
+            foreach (var device in conectedDevicesCollection)
+                btDevices.Add(await BluetoothDevice.FromIdAsync(device.Id));
+
+            return btDevices.Exists(device => device.ClassOfDevice.MajorClass == BluetoothMajorClass.AudioVideo)
                 ? EBluetoothState.EnabledConnected
                 : EBluetoothState.EnabledDisconnected;
         }
