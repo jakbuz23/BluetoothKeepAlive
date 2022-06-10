@@ -18,7 +18,7 @@ namespace BluetoothKeepAliveSound.SoundPlayer
             OutEvent = new WaveOutEvent();
             SignalGenerator generator = new SignalGenerator
             {
-                Gain = 0.005,
+                Gain = 0.05,
                 Frequency = 1.0,
                 Type = SignalGeneratorType.Sin
             };
